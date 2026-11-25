@@ -1,0 +1,15 @@
+# Build
+target/
+
+# Credenciais e segredos - NUNCA versionar
+firebase-credenciais.json
+*-firebase-adminsdk-*.json
+.env
+
+# IDEs
+nbproject/private/
+nb-configuration.xml
+.idea/
+*.iml
+.vscode/
+.DS_Store

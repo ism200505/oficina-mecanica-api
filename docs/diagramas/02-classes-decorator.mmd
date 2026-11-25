@@ -1,0 +1,86 @@
+---
+title: Diagrama de Classes 2 - Padrão Decorator (serviços e adicionais da oficina)
+---
+classDiagram
+    direction TB
+
+    class Servico {
+        <<interface>>
+        +descricao() String
+        +preco() Dinheiro
+        +prazoEmHoras() int
+    }
+
+    class RevisaoPreventiva {
+        +descricao() String
+        +preco() Dinheiro
+        +prazoEmHoras() int
+    }
+    class DiagnosticoEletronico {
+        +descricao() String
+        +preco() Dinheiro
+        +prazoEmHoras() int
+    }
+    class ManutencaoCorretiva {
+        +descricao() String
+        +preco() Dinheiro
+        +prazoEmHoras() int
+    }
+
+    class ServicoDecorator {
+        <<abstract>>
+        #Servico servico
+        #ServicoDecorator(Servico servico)
+        +descricao()* String
+    }
+
+    class TrocaDeOleoDecorator { +preco() Dinheiro }
+    class AlinhamentoBalanceamentoDecorator { +preco() Dinheiro }
+    class TrocaPastilhasFreioDecorator { +preco() Dinheiro }
+    class HigienizacaoArCondicionadoDecorator { +preco() Dinheiro }
+    class LavagemCompletaDecorator { +preco() Dinheiro }
+    class LevaETrazDecorator { +preco() Dinheiro }
+    class GarantiaEstendidaDecorator { +preco() Dinheiro }
+
+    class TipoServicoBase {
+        <<enumeration>>
+        REVISAO_PREVENTIVA
+        DIAGNOSTICO_ELETRONICO
+        MANUTENCAO_CORRETIVA
+        +criar() Servico
+    }
+
+    class Adicional {
+        <<enumeration>>
+        TROCA_DE_OLEO
+        ALINHAMENTO_BALANCEAMENTO
+        TROCA_PASTILHAS_FREIO
+        HIGIENIZACAO_AR_CONDICIONADO
+        LAVAGEM_COMPLETA
+        LEVA_E_TRAZ
+        GARANTIA_ESTENDIDA
+        +decorar(Servico servico) Servico
+    }
+
+    class Adicionais {
+        -List~Adicional~ itens
+        +de(Collection~Adicional~ itens)$ Adicionais
+        +decorar(Servico base) Servico
+        +nomes() List~String~
+    }
+
+    Servico <|.. RevisaoPreventiva : ConcreteComponent
+    Servico <|.. DiagnosticoEletronico : ConcreteComponent
+    Servico <|.. ManutencaoCorretiva : ConcreteComponent
+    Servico <|.. ServicoDecorator
+    ServicoDecorator o-- Servico : decora
+    ServicoDecorator <|-- TrocaDeOleoDecorator
+    ServicoDecorator <|-- AlinhamentoBalanceamentoDecorator
+    ServicoDecorator <|-- TrocaPastilhasFreioDecorator
+    ServicoDecorator <|-- HigienizacaoArCondicionadoDecorator
+    ServicoDecorator <|-- LavagemCompletaDecorator
+    ServicoDecorator <|-- LevaETrazDecorator
+    ServicoDecorator <|-- GarantiaEstendidaDecorator
+    TipoServicoBase ..> Servico : cria
+    Adicional ..> ServicoDecorator : cria
+    Adicionais o-- Adicional

@@ -1,0 +1,126 @@
+---
+title: Diagrama de Classes 1 - Entidades e relacionamentos (1:1 e 1:N)
+---
+classDiagram
+    direction LR
+
+    class Cliente {
+        -String id
+        -String nome
+        -Cpf cpf
+        -Email email
+        -Telefone telefone
+        -LocalDate dataNascimento
+        -Endereco endereco
+        -CanalNotificacao canalNotificacao
+        -LocalDate dataCadastro
+        -boolean ativo
+        -String observacoes
+        +possuiCpf(Cpf outro) boolean
+    }
+
+    class Endereco {
+        <<record>>
+        +String logradouro
+        +String numero
+        +String complemento
+        +String bairro
+        +String cidade
+        +String uf
+        +String cep
+    }
+
+    class Veiculo {
+        -String id
+        -String clienteId
+        -Placa placa
+        -String marca
+        -String modelo
+        -int anoFabricacao
+        -int anoModelo
+        -String cor
+        -String chassi
+        -TipoCombustivel combustivel
+        -Quilometragem quilometragemAtual
+        -LocalDate dataUltimaRevisao
+        -Quilometragem quilometragemUltimaRevisao
+        -LocalDate dataUltimoLembrete
+        +registrarQuilometragem(Quilometragem nova) void
+        +registrarRevisao(LocalDate data, Quilometragem km) void
+        +registrarLembreteEnviado(LocalDate data) void
+        +precisaDeRevisao(LocalDate hoje) boolean
+        +deveReceberLembrete(LocalDate hoje) boolean
+    }
+
+    class OrdemServico {
+        -String id
+        -String numero
+        -String clienteId
+        -String veiculoId
+        -String descricaoProblema
+        -String mecanicoResponsavel
+        -Quilometragem quilometragemEntrada
+        -TipoServicoBase servicoBase
+        -Adicionais adicionais
+        -Orcamento orcamento
+        -StatusOrdemServico status
+        -LocalDateTime dataAbertura
+        -LocalDateTime previsaoEntrega
+        -LocalDateTime dataConclusao
+        +alterarStatus(StatusOrdemServico novo, LocalDateTime agora) void
+        +concluiuRevisaoPreventiva() boolean
+        +podeSerExcluida() boolean
+        +mensagemDeAcompanhamento() String
+    }
+
+    class Orcamento {
+        <<record>>
+        +String descricao
+        +Dinheiro valorServicos
+        +Dinheiro valorFinal
+        +int prazoEmHoras
+        +TipoPagamento formaPagamento
+    }
+
+    class StatusOrdemServico {
+        <<enumeration>>
+        ABERTA
+        EM_EXECUCAO
+        CONCLUIDA
+        ENTREGUE
+        CANCELADA
+        +podeMudarPara(StatusOrdemServico novo) boolean
+    }
+
+    class CanalNotificacao {
+        <<enumeration>>
+        EMAIL
+        WHATSAPP
+        SMS
+    }
+
+    class Usuario {
+        <<record>>
+        +String id
+        +String nome
+        +String login
+        +String senhaHash
+        +Papel papel
+        +boolean ativo
+    }
+
+    class Papel {
+        <<enumeration>>
+        ADMIN
+        ATENDENTE
+        MECANICO
+    }
+
+    Cliente "1" *-- "1" Endereco : possui - um para um
+    Cliente "1" -- "0..*" Veiculo : é proprietário de - um para muitos
+    Veiculo "1" -- "0..*" OrdemServico : histórico - um para muitos
+    Cliente "1" -- "0..*" OrdemServico : solicita - um para muitos
+    OrdemServico "1" *-- "1" Orcamento : possui - um para um
+    OrdemServico --> StatusOrdemServico
+    Cliente --> CanalNotificacao
+    Usuario --> Papel

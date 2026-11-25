@@ -1,0 +1,94 @@
+---
+title: Diagrama de Classes 3 - Strategy (pagamento), DIP/LSP (notificações) e Observer (automação)
+---
+classDiagram
+    direction LR
+
+    class FormaPagamento {
+        <<interface>>
+        +calcularValorFinal(Dinheiro valor) Dinheiro
+        +descricao() String
+    }
+    class PagamentoAVista
+    class PagamentoAPrazo
+    class PagamentoPix
+    class TipoPagamento {
+        <<enumeration>>
+        A_VISTA
+        A_PRAZO
+        PIX
+        +forma() FormaPagamento
+    }
+    class OrcamentoService {
+        +calcular(TipoServicoBase base, Adicionais adicionais, TipoPagamento tipo) Orcamento
+    }
+
+    FormaPagamento <|.. PagamentoAVista
+    FormaPagamento <|.. PagamentoAPrazo
+    FormaPagamento <|.. PagamentoPix
+    TipoPagamento --> FormaPagamento
+    OrcamentoService ..> FormaPagamento : usa
+    OrcamentoService ..> Servico : usa (Decorator)
+
+    class Notificador {
+        <<interface>>
+        +canal() CanalNotificacao
+        +enviar(Cliente cliente, String mensagem) Notificacao
+    }
+    class NotificadorRegistrado {
+        <<abstract>>
+        +enviar(Cliente cliente, String mensagem) Notificacao
+        #destinoDo(Cliente cliente)* String
+        #transmitir(String destino, String mensagem) void
+    }
+    class EmailNotificador
+    class WhatsAppNotificador
+    class SmsNotificador
+    class CentralDeNotificacoes {
+        -Map~CanalNotificacao, Notificador~ notificadores
+        +notificar(Cliente cliente, String mensagem) Notificacao
+        +historico(String clienteId) List~Notificacao~
+    }
+    class NotificacaoRepository {
+        <<interface>>
+        +salvar(Notificacao n) Notificacao
+        +listarTodas() List~Notificacao~
+        +listarPorCliente(String clienteId) List~Notificacao~
+    }
+
+    Notificador <|.. NotificadorRegistrado
+    NotificadorRegistrado <|-- EmailNotificador
+    NotificadorRegistrado <|-- WhatsAppNotificador
+    NotificadorRegistrado <|-- SmsNotificador
+    CentralDeNotificacoes o-- "1..*" Notificador
+    CentralDeNotificacoes --> NotificacaoRepository
+
+    class OuvinteDeStatus {
+        <<interface>>
+        +statusAlterado(OrdemServico ordem) void
+    }
+    class PublicadorDeStatus {
+        -List~OuvinteDeStatus~ ouvintes
+        +publicar(OrdemServico ordem) void
+    }
+    class NotificarClienteOuvinte {
+        +statusAlterado(OrdemServico ordem) void
+    }
+    class RegistrarRevisaoOuvinte {
+        +statusAlterado(OrdemServico ordem) void
+    }
+    class OrdemServicoService {
+        +abrir(OrdemServicoRequest dados) OrdemServico
+        +alterarStatus(String id, StatusOrdemServico novo) OrdemServico
+    }
+    class LembreteRevisaoService {
+        +executar() int
+    }
+
+    PublicadorDeStatus o-- "0..*" OuvinteDeStatus : Subject avisa Observers
+    OuvinteDeStatus <|.. NotificarClienteOuvinte
+    OuvinteDeStatus <|.. RegistrarRevisaoOuvinte
+    OrdemServicoService --> PublicadorDeStatus
+    OrdemServicoService --> OrcamentoService
+    NotificarClienteOuvinte --> CentralDeNotificacoes
+    LembreteRevisaoService --> CentralDeNotificacoes

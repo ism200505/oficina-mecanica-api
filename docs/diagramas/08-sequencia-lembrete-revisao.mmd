@@ -1,0 +1,32 @@
+---
+title: Diagrama de Sequência 4 - Lembrete automático de revisão (tarefa agendada diária)
+---
+sequenceDiagram
+    autonumber
+    participant AG as Agendador (@Scheduled 08:00)
+    participant L as :LembreteRevisaoService
+    participant VR as :VeiculoRepository
+    participant V as veiculo:Veiculo
+    participant CR as :ClienteRepository
+    participant CN as :CentralDeNotificacoes
+    participant N as :Notificador
+    participant NR as :NotificacaoRepository
+
+    AG->>L: executar()
+    L->>VR: listarTodos()
+    VR-->>L: veículos
+    loop para cada veículo
+        L->>V: deveReceberLembrete(hoje)
+        Note right of V: 6 meses ou 10.000 km desde a última revisão<br/>e nenhum lembrete nos últimos 30 dias
+        opt revisão vencida
+            L->>CR: buscarPorId(clienteId)
+            CR-->>L: cliente
+            L->>CN: notificar(cliente, "sua revisão está vencida...")
+            CN->>N: enviar(cliente, mensagem)
+            N-->>CN: Notificacao
+            CN->>NR: salvar(notificacao)
+            L->>V: registrarLembreteEnviado(hoje)
+            L->>VR: salvar(veiculo)
+        end
+    end
+    L-->>AG: quantidade de lembretes enviados

@@ -1,0 +1,88 @@
+---
+title: Diagrama de Classes 4 - Camadas REST e Inversão de Dependência (Firebase x Memória)
+---
+classDiagram
+    direction TB
+
+    class ClienteController {
+        +cadastrar(ClienteRequest dados) ResponseEntity
+        +listar() List~ClienteResponse~
+        +buscar(String id) ClienteResponse
+        +atualizar(String id, ClienteRequest dados) ClienteResponse
+        +remover(String id) ResponseEntity
+        +veiculos(String id) List~VeiculoResponse~
+    }
+    class ClienteService {
+        -ClienteRepository clientes
+        -VeiculoRepository veiculos
+        -Clock relogio
+        +cadastrar(ClienteRequest dados) Cliente
+        +buscarPorId(String id) Cliente
+        +listar() List~Cliente~
+        +atualizar(String id, ClienteRequest dados) Cliente
+        +remover(String id) void
+        +veiculosDoCliente(String id) List~Veiculo~
+    }
+    class ClienteRepository {
+        <<interface>>
+        +salvar(Cliente c) Cliente
+        +buscarPorId(String id) Optional~Cliente~
+        +buscarPorCpf(Cpf cpf) Optional~Cliente~
+        +listarTodos() List~Cliente~
+        +remover(String id) void
+    }
+    class VeiculoRepository {
+        <<interface>>
+        +listarPorCliente(String clienteId) List~Veiculo~
+    }
+    class RepositorioFirestore {
+        <<abstract>>
+        #gravar(String id, Documento d) void
+        #ler(String id) Optional~Documento~
+        #lerOnde(String campo, Object valor) List~Documento~
+    }
+    class FirestoreClienteRepository {
+        <<Profile default>>
+    }
+    class MemoriaClienteRepository {
+        <<Profile memoria>>
+    }
+    class Firestore {
+        <<Firebase SDK>>
+    }
+
+    class AutenticacaoController {
+        +login(LoginRequest credenciais) TokenResponse
+    }
+    class AutenticacaoService {
+        +autenticar(LoginRequest credenciais) TokenResponse
+    }
+    class GeradorDeToken {
+        <<interface>>
+        +gerar(Usuario usuario) String
+        +validadeEmMinutos() long
+    }
+    class JwtService {
+        +gerar(Usuario usuario) String
+        +validar(String token) Optional~Claims~
+    }
+    class PasswordEncoder {
+        <<interface>>
+    }
+    class JwtFiltroAutenticacao {
+        #doFilterInternal(...) void
+    }
+
+    ClienteController --> ClienteService
+    ClienteService --> ClienteRepository
+    ClienteService --> VeiculoRepository
+    ClienteRepository <|.. FirestoreClienteRepository
+    ClienteRepository <|.. MemoriaClienteRepository
+    RepositorioFirestore <|-- FirestoreClienteRepository
+    RepositorioFirestore --> Firestore
+
+    AutenticacaoController --> AutenticacaoService
+    AutenticacaoService --> GeradorDeToken
+    AutenticacaoService --> PasswordEncoder
+    GeradorDeToken <|.. JwtService
+    JwtFiltroAutenticacao --> JwtService

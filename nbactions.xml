@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ações do NetBeans: "Run Project" (F6) usa o Firebase; a ação customizada roda em memória. -->
+<actions>
+    <action>
+        <actionName>run</actionName>
+        <packagings>
+            <packaging>jar</packaging>
+        </packagings>
+        <goals>
+            <goal>spring-boot:run</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>debug</actionName>
+        <packagings>
+            <packaging>jar</packaging>
+        </packagings>
+        <goals>
+            <goal>spring-boot:run</goal>
+        </goals>
+        <properties>
+            <spring-boot.run.jvmArguments>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</spring-boot.run.jvmArguments>
+            <jpda.listen>true</jpda.listen>
+        </properties>
+    </action>
+    <action>
+        <actionName>CUSTOM-rodar-memoria</actionName>
+        <displayName>Rodar sem Firebase (perfil memoria)</displayName>
+        <goals>
+            <goal>spring-boot:run</goal>
+        </goals>
+        <properties>
+            <spring-boot.run.profiles>memoria</spring-boot.run.profiles>
+        </properties>
+    </action>
+    <action>
+        <actionName>CUSTOM-testes</actionName>
+        <displayName>Rodar testes unitários</displayName>
+        <goals>
+            <goal>test</goal>
+        </goals>
+    </action>
+</actions>

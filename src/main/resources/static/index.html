@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Oficina Mecânica</title>
+    <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<section id="tela-login" class="login">
+    <form id="form-login" class="cartao">
+        <h1>🔧 Oficina Mecânica</h1>
+        <p class="sutil">Entre com seu usuário</p>
+        <label>Login <input name="login" required autocomplete="username"></label>
+        <label>Senha <input name="senha" type="password" required autocomplete="current-password"></label>
+        <button type="submit">Entrar</button>
+        <p id="erro-login" class="erro"></p>
+    </form>
+</section>
+
+<section id="tela-app" class="oculto">
+    <header>
+        <strong>🔧 Oficina Mecânica</strong>
+        <nav>
+            <button data-aba="ordens" class="ativa">Ordens de serviço</button>
+            <button data-aba="clientes">Clientes</button>
+            <button data-aba="veiculos">Veículos</button>
+            <button data-aba="orcamento">Simular orçamento</button>
+            <button data-aba="notificacoes">Notificações</button>
+        </nav>
+        <span><span id="usuario-logado"></span> <button id="sair" class="secundario">Sair</button></span>
+    </header>
+
+    <p id="mensagem" class="mensagem oculto"></p>
+
+    <main>
+        <!-- ORDENS DE SERVIÇO -->
+        <section id="aba-ordens" class="aba">
+            <form id="form-ordem" class="cartao grade">
+                <h2>Abrir ordem de serviço</h2>
+                <label>Veículo <select name="veiculoId" required></select></label>
+                <label>Quilometragem de entrada <input name="quilometragemEntrada" type="number" min="0" required></label>
+                <label>Mecânico responsável <input name="mecanicoResponsavel" required></label>
+                <label>Serviço base <select name="servicoBase" required></select></label>
+                <label>Forma de pagamento <select name="formaPagamento" required></select></label>
+                <label class="largo">Descrição do problema <textarea name="descricaoProblema" required></textarea></label>
+                <fieldset class="largo"><legend>Adicionais (Decorator)</legend><div id="adicionais-ordem" class="checks"></div></fieldset>
+                <button type="submit">Abrir OS e calcular orçamento</button>
+            </form>
+            <div class="cartao">
+                <h2>Ordens de serviço</h2>
+                <table><thead><tr><th>Número</th><th>Veículo</th><th>Serviço</th><th>Valor</th><th>Previsão</th><th>Status</th><th>Ações</th></tr></thead>
+                    <tbody id="tabela-ordens"></tbody></table>
+            </div>
+        </section>
+
+        <!-- CLIENTES -->
+        <section id="aba-clientes" class="aba oculto">
+            <form id="form-cliente" class="cartao grade">
+                <h2>Cadastrar cliente</h2>
+                <label>Nome <input name="nome" required></label>
+                <label>CPF <input name="cpf" required placeholder="000.000.000-00"></label>
+                <label>E-mail <input name="email" type="email" required></label>
+                <label>Telefone <input name="telefone" required placeholder="(12) 99999-9999"></label>
+                <label>Nascimento <input name="dataNascimento" type="date" required></label>
+                <label>Canal de notificação <select name="canalNotificacao"><option>WHATSAPP</option><option>EMAIL</option><option>SMS</option></select></label>
+                <label>Logradouro <input name="logradouro" required></label>
+                <label>Número <input name="numero" required></label>
+                <label>Complemento <input name="complemento"></label>
+                <label>Bairro <input name="bairro" required></label>
+                <label>Cidade <input name="cidade" required></label>
+                <label>UF <input name="uf" maxlength="2" required></label>
+                <label>CEP <input name="cep" required placeholder="00000-000"></label>
+                <label class="largo">Observações <input name="observacoes"></label>
+                <button type="submit">Salvar cliente</button>
+            </form>
+            <div class="cartao">
+                <h2>Clientes</h2>
+                <table><thead><tr><th>Nome</th><th>CPF</th><th>Telefone</th><th>Cidade</th><th>Canal</th><th>Ações</th></tr></thead>
+                    <tbody id="tabela-clientes"></tbody></table>
+            </div>
+        </section>
+
+        <!-- VEÍCULOS -->
+        <section id="aba-veiculos" class="aba oculto">
+            <form id="form-veiculo" class="cartao grade">
+                <h2>Cadastrar veículo</h2>
+                <label>Proprietário <select name="clienteId" required></select></label>
+                <label>Placa <input name="placa" required placeholder="ABC1D23"></label>
+                <label>Marca <input name="marca" required></label>
+                <label>Modelo <input name="modelo" required></label>
+                <label>Ano fabricação <input name="anoFabricacao" type="number" required></label>
+                <label>Ano modelo <input name="anoModelo" type="number" required></label>
+                <label>Cor <input name="cor" required></label>
+                <label>Chassi <input name="chassi" maxlength="17"></label>
+                <label>Combustível <select name="combustivel"><option>FLEX</option><option>GASOLINA</option><option>ETANOL</option><option>DIESEL</option><option>GNV</option><option>HIBRIDO</option><option>ELETRICO</option></select></label>
+                <label>Km atual <input name="quilometragemAtual" type="number" min="0" required></label>
+                <label>Data da última revisão <input name="dataUltimaRevisao" type="date"></label>
+                <label>Km na última revisão <input name="quilometragemUltimaRevisao" type="number" min="0"></label>
+                <button type="submit">Salvar veículo</button>
+            </form>
+            <div class="cartao">
+                <h2>Veículos</h2>
+                <table><thead><tr><th>Placa</th><th>Veículo</th><th>Km</th><th>Última revisão</th><th>Revisão</th><th>Ações</th></tr></thead>
+                    <tbody id="tabela-veiculos"></tbody></table>
+            </div>
+        </section>
+
+        <!-- ORÇAMENTO -->
+        <section id="aba-orcamento" class="aba oculto">
+            <form id="form-orcamento" class="cartao grade">
+                <h2>Simular orçamento (Decorator + Strategy)</h2>
+                <label>Serviço base <select name="servicoBase" required></select></label>
+                <label>Forma de pagamento <select name="formaPagamento" required></select></label>
+                <fieldset class="largo"><legend>Adicionais</legend><div id="adicionais-orcamento" class="checks"></div></fieldset>
+                <button type="submit">Calcular</button>
+            </form>
+            <div id="resultado-orcamento" class="cartao oculto"></div>
+        </section>
+
+        <!-- NOTIFICAÇÕES -->
+        <section id="aba-notificacoes" class="aba oculto">
+            <div class="cartao">
+                <h2>Notificações automáticas enviadas</h2>
+                <button id="executar-lembretes">Executar agora a rotina de lembretes de revisão</button>
+                <table><thead><tr><th>Data/hora</th><th>Canal</th><th>Destino</th><th>Mensagem</th></tr></thead>
+                    <tbody id="tabela-notificacoes"></tbody></table>
+            </div>
+        </section>
+    </main>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+---
+title: Diagrama de Sequência 3 - Concluir OS (Observer notifica o cliente e registra a revisão)
+---
+sequenceDiagram
+    autonumber
+    actor M as Mecânico
+    participant C as :OrdemServicoController
+    participant S as :OrdemServicoService
+    participant OR as :OrdemServicoRepository
+    participant O as ordem:OrdemServico
+    participant PB as :PublicadorDeStatus
+    participant NO as :NotificarClienteOuvinte
+    participant RR as :RegistrarRevisaoOuvinte
+    participant VR as :VeiculoRepository
+    participant CN as :CentralDeNotificacoes
+
+    M->>C: PATCH /api/v1/ordens-servico/{id}/status {status: CONCLUIDA}
+    C->>S: alterarStatus(id, CONCLUIDA)
+    S->>OR: buscarPorId(id)
+    OR-->>S: ordem
+    S->>O: alterarStatus(CONCLUIDA, agora)
+    alt transição não permitida (ex.: ABERTA -> ENTREGUE)
+        O-->>S: RegraDeNegocioException
+        S-->>C: exceção
+        C-->>M: 422 Unprocessable Entity
+    else transição válida (EM_EXECUCAO -> CONCLUIDA)
+        O->>O: status = CONCLUIDA e dataConclusao = agora
+        S->>OR: salvar(ordem)
+        S->>PB: publicar(ordem)
+        loop para cada OuvinteDeStatus
+            PB->>NO: statusAlterado(ordem)
+            NO->>CN: notificar(cliente, "serviço concluído...")
+            PB->>RR: statusAlterado(ordem)
+            opt serviço base = REVISAO_PREVENTIVA
+                RR->>VR: buscarPorId(veiculoId)
+                RR->>VR: salvar(veiculo com nova data/km de revisão)
+            end
+        end
+        S-->>C: ordem
+        C-->>M: 200 OK
+    end

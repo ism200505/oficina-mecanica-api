@@ -1,0 +1,36 @@
+---
+title: Diagrama de Sequência 1 - Login de usuário (Spring Security + JWT)
+---
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant F as Front-end
+    participant AC as :AutenticacaoController
+    participant AS as :AutenticacaoService
+    participant L as :LimitadorDeTentativas
+    participant R as :UsuarioRepository
+    participant P as :PasswordEncoder
+    participant J as :GeradorDeToken
+
+    U->>F: informa login e senha
+    F->>AC: POST /api/v1/auth/login {login, senha}
+    AC->>AS: autenticar(credenciais)
+    AS->>L: verificar(login)
+    AS->>R: buscarPorLogin(login)
+    R-->>AS: Optional(Usuario)
+    AS->>P: matches(senha, senhaHash)
+    P-->>AS: true / false
+    alt credenciais válidas e usuário ativo
+        AS->>L: registrarSucesso(login)
+        AS->>J: gerar(usuario)
+        J-->>AS: token JWT assinado
+        AS-->>AC: TokenResponse
+        AC-->>F: 200 OK {token, tipo: "Bearer", papel}
+        F-->>U: abre o sistema
+    else credenciais inválidas
+        AS->>L: registrarFalha(login)
+        AS-->>AC: CredenciaisInvalidasException
+        AC-->>F: 401 Unauthorized (5 falhas = 429 bloqueado)
+        F-->>U: "Login ou senha inválidos"
+    end
+    Note over F,AC: Próximas requisições enviam "Authorization: Bearer token",<br/>validado pelo JwtFiltroAutenticacao antes de chegar aos controllers.

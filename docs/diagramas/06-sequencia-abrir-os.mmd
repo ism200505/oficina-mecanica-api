@@ -1,0 +1,46 @@
+---
+title: Diagrama de Sequência 2 - Abrir Ordem de Serviço com orçamento automático
+---
+sequenceDiagram
+    autonumber
+    actor A as Atendente
+    participant C as :OrdemServicoController
+    participant S as :OrdemServicoService
+    participant VR as :VeiculoRepository
+    participant V as veiculo:Veiculo
+    participant OS as :OrcamentoService
+    participant D as servico:Servico (Decorators)
+    participant FP as :FormaPagamento
+    participant OR as :OrdemServicoRepository
+    participant PB as :PublicadorDeStatus
+    participant NO as :NotificarClienteOuvinte
+    participant CN as :CentralDeNotificacoes
+
+    A->>C: POST /api/v1/ordens-servico {veiculoId, km, servicoBase, adicionais, formaPagamento}
+    C->>S: abrir(dados)
+    S->>VR: buscarPorId(veiculoId)
+    alt veículo não existe
+        VR-->>S: Optional.empty()
+        S-->>C: RecursoNaoEncontradoException
+        C-->>A: 404 Not Found
+    else veículo encontrado
+        VR-->>S: veiculo
+        S->>V: registrarQuilometragem(km)
+        S->>OS: calcular(servicoBase, adicionais, tipoPagamento)
+        OS->>D: adicionais.decorar(servicoBase.criar())
+        Note right of D: Revisão -> TrocaDeOleo -> Alinhamento<br/>cada decorator soma preço e prazo
+        D-->>OS: servico decorado
+        OS->>D: preco() / descricao() / prazoEmHoras()
+        OS->>FP: calcularValorFinal(preco)
+        FP-->>OS: valor final (desconto/juros)
+        OS-->>S: Orcamento
+        S->>S: new OrdemServico(ABERTA, previsão = agora + prazo)
+        S->>VR: salvar(veiculo)
+        S->>OR: salvar(ordem)
+        S->>PB: publicar(ordem)
+        PB->>NO: statusAlterado(ordem)
+        NO->>CN: notificar(cliente, mensagemDeAcompanhamento)
+        Note right of CN: escolhe E-mail, WhatsApp ou SMS<br/>pelo canal do cliente e grava o histórico
+        S-->>C: ordem
+        C-->>A: 201 Created + Location /api/v1/ordens-servico/{id}
+    end
