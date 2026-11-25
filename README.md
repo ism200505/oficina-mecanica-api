@@ -1,10 +1,11 @@
 # 🔧 Oficina Mecânica API
 
+> ## 📄 [CLIQUE AQUI PARA VER O RESUMO DO PROJETO EM PDF](Apresentacao-Oficina-Mecanica.pdf)
+> O que o aplicativo é, o que ele faz, as automações e as tecnologias usadas, em uma página.
+
 Sistema de gerenciamento de oficina mecânica (clientes, veículos e ordens de serviço) desenvolvido para a avaliação **M2 de Padrões de Projeto** – Engenharia de Software, 5º semestre (UMC).
 
 **Grupo G09:** Iago Sousa Martins · Gustavo Fereira
-
-📄 **Resumo do projeto em PDF:** [docs/Apresentacao-Oficina-Mecanica.pdf](docs/Apresentacao-Oficina-Mecanica.pdf)
 
 ---
 
