@@ -4,6 +4,8 @@ Sistema de gerenciamento de oficina mecânica (clientes, veículos e ordens de s
 
 **Grupo G09:** Iago Sousa Martins · Gustavo Fereira
 
+📄 **Resumo do projeto em PDF:** [docs/Apresentacao-Oficina-Mecanica.pdf](docs/Apresentacao-Oficina-Mecanica.pdf)
+
 ---
 
 ## Sumário
